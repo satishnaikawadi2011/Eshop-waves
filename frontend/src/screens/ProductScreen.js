@@ -11,7 +11,7 @@ const ProductScreen = ({ match, history }) => {
 	const [
 		qty,
 		setQty
-	] = useState(0);
+	] = useState(1);
 	const dispatch = useDispatch();
 	const productDetails = useSelector((state) => state.productDetails);
 	const { loading, error, product } = productDetails;
@@ -87,7 +87,11 @@ const ProductScreen = ({ match, history }) => {
 														{[
 															...Array(product.countInStock).keys()
 														].map((x) => {
-															return <option key={x + 1}>{x + 1}</option>;
+															return (
+																<option key={x + 1} value={x + 1}>
+																	{x + 1}
+																</option>
+															);
 														})}
 													</Form.Control>
 												</Col>

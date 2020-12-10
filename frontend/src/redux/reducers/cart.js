@@ -1,3 +1,4 @@
+import filter_array_values from '../../utils/filterArray';
 import { CART_ADD_ITEM } from '../types';
 
 const initialState = {
@@ -7,16 +8,16 @@ const initialState = {
 export const cartReducer = (state = initialState, action) => {
 	switch (action.type) {
 		case CART_ADD_ITEM:
-			const item = action.paylod;
-
-			const isExistInCart = state.cartItems.find((x) => x.product === item.product);
-			if (isExistInCart) {
+			const item = action.payload;
+			const cartItems = filter_array_values(state.cartItems);
+			const existItem = cartItems.find((x) => x.product === item.product);
+			if (existItem) {
 				return {
 					...state,
-					cartItems : state.cartItems.map(
+					cartItems : cartItems.map(
 						(x) =>
 
-								x.product === isExistInCart.product ? item :
+								x.product === existItem.product ? item :
 								x
 					)
 				};
@@ -25,7 +26,7 @@ export const cartReducer = (state = initialState, action) => {
 				return {
 					...state,
 					cartItems : [
-						...state.cartItems,
+						...cartItems,
 						item
 					]
 				};
