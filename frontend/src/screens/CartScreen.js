@@ -1,10 +1,10 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Button, Col, Form, Image, ListGroup, Row } from 'react-bootstrap';
+import { Button, Card, Col, Form, Image, ListGroup, Row } from 'react-bootstrap';
 import Message from '../components/Message';
 import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
-import { addToCart } from '../redux/actions/cart';
+import { addToCart, removeFromCart } from '../redux/actions/cart';
 
 const CartScreen = ({ match, location, history }) => {
 	const productId = match.params.id;
@@ -28,7 +28,29 @@ const CartScreen = ({ match, location, history }) => {
 			qty
 		]
 	);
-	const removeFromCarthandler = () => {};
+	const getTotalItems = (cartItems) => {
+		let count = 0;
+		cartItems.forEach((item) => {
+			count += item.qty;
+		});
+
+		return count;
+	};
+
+	const getTotalPrice = (cartItems) => {
+		let price = 0;
+		cartItems.forEach((item) => {
+			price += item.qty * item.price;
+		});
+
+		return price;
+	};
+	const checkoutHandler = () => {
+		history.push('/login?redirect=shipping');
+	};
+	const removeFromCarthandler = (id) => {
+		dispatch(removeFromCart(id));
+	};
 	return (
 		<Row>
 			<Col md={8}>
@@ -52,14 +74,18 @@ const CartScreen = ({ match, location, history }) => {
 										<Col md={2}>
 											<Form.Control
 												as="select"
-												value={qty}
+												value={item.qty}
 												onChange={(e) =>
 													dispatch(addToCart(item.product, Number(e.target.value)))}
 											>
 												{[
 													...Array(item.countInStock).keys()
 												].map((x) => {
-													return <option key={x + 1}>{x + 1}</option>;
+													return (
+														<option key={x + 1} value={x + 1}>
+															{x + 1}
+														</option>
+													);
 												})}
 											</Form.Control>
 										</Col>
@@ -78,8 +104,26 @@ const CartScreen = ({ match, location, history }) => {
 						})}
 					</ListGroup>}
 			</Col>
-			<Col md={2} />
-			<Col md={2} />
+			<Col md={4}>
+				<Card>
+					<ListGroup variant="flush">
+						<ListGroup.Item>
+							<h2>Subtotal ({getTotalItems(cartItems)}) items</h2>
+							${getTotalPrice(cartItems).toFixed(2)}
+						</ListGroup.Item>
+						<ListGroup.Item>
+							<Button
+								as="button"
+								className="btn btn-block"
+								disabled={cartItems.length === 0}
+								onClick={checkoutHandler}
+							>
+								Proceed To Checkout
+							</Button>
+						</ListGroup.Item>
+					</ListGroup>
+				</Card>
+			</Col>
 		</Row>
 	);
 };
